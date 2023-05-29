@@ -1541,7 +1541,7 @@ $(window).on("load", () => {
         "Fe2O3",
         "Fe2O2",
         "Pb(C2H3O2)2",
-        "Fe2(NO3)2"
+        "Fe(NO3)2"
     ];
     exports.$input.val((0, Util_1.sample)(examples));
     // $input.val("Fe2(NO3)2");
