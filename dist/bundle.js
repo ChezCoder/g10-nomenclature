@@ -88,9 +88,9 @@ exports.QUANTITY_SUBSCRIPTS = {
 };
 exports.SUBSCRIPT_TO_NUM = (0, Util_1.swapObj)(exports.QUANTITY_SUBSCRIPTS);
 class Bondable {
-    constructor(elements, charge, name) {
+    constructor(elements, charges, name) {
         this.elements = elements;
-        this.charge = charge;
+        this.charges = charges;
         this._name = name;
     }
     get chemicalFormula() {
@@ -107,7 +107,16 @@ class Bondable {
         return this.elements[0].element;
     }
     get actsLikeMetal() {
-        return this.charge > 0;
+        return (this.isMultivalent && this.singletonElement.metal) || this.primaryCharge > 0;
+    }
+    get primaryCharge() {
+        return this.charges[0];
+    }
+    get primaryQuantity() {
+        return this.quantity || this.elements[0].quantity;
+    }
+    get isMultivalent() {
+        return this.charges.length > 1;
     }
     isSingleton(strict = false) {
         return this.elements.length == 1 && (strict ? this.elements[0].quantity == 1 : true);
@@ -134,8 +143,13 @@ class Bondable {
             return this._name;
         }
     }
+    clone() {
+        const copy = new Bondable(this.elements, this.charges, this.name);
+        copy.quantity = this.primaryQuantity;
+        return copy;
+    }
     static fromElement(element, quantity = 1, charge) {
-        return new Bondable([{ element, quantity }], charge ? charge : (element.charges.length == 1 ? element.charges[0] : element.charges[element.charges.length - 1]));
+        return new Bondable([{ element, quantity }], charge ? [charge] : element.charges);
     }
 }
 exports.Bondable = Bondable;
@@ -192,152 +206,152 @@ exports.POLYATOMICS = {
     "NITRATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.NITROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -1, "NITRATE"),
+    ], [-1], "NITRATE"),
     "NITRITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.NITROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 2 }
-    ], -1, "NITRITE"),
+    ], [-1], "NITRITE"),
     "CHROMATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CHROMIUM, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -2, "CHROMATE"),
+    ], [-2], "CHROMATE"),
     "DICHROMATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CHROMIUM, "quantity": 2 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 7 }
-    ], -2, "DICHROMATE"),
+    ], [-2], "DICHROMATE"),
     "CYANIDE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CARBON, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.NITROGEN, "quantity": 1 }
-    ], -1, "CYANIDE"),
+    ], [-1], "CYANIDE"),
     "THIOCYANATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.SULFUR, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.CARBON, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.NITROGEN, "quantity": 1 }
-    ], -1, "THIOCYANATE"),
+    ], [-1], "THIOCYANATE"),
     "PERMANGANATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.MANGANESE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -1, "PERMANGANATE"),
+    ], [-1], "PERMANGANATE"),
     "HYDROXIDE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 1 }
-    ], -1, "HYDROXIDE"),
+    ], [-1], "HYDROXIDE"),
     "PEROXIDE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 2 }
-    ], -2, "PEROXIDE"),
+    ], [-2], "PEROXIDE"),
     "AMIDE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.NITROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 2 }
-    ], -1, "AMIDE"),
+    ], [-1], "AMIDE"),
     "SULFATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.SULFUR, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -2, "SULFATE"),
+    ], [-2], "SULFATE"),
     "SULFITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.SULFUR, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -2, "SULFITE"),
+    ], [-2], "SULFITE"),
     "PHOSPHATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.PHOSPHORUS, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -3, "PHOSPHATE"),
+    ], [-3], "PHOSPHATE"),
     "PHOSPHITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.PHOSPHORUS, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -3, "PHOSPHITE"),
+    ], [-3], "PHOSPHITE"),
     "HYDROGEN PHOSPHATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.PHOSPHORUS, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -2, "HYDROGEN PHOSPHATE"),
+    ], [-2], "HYDROGEN PHOSPHATE"),
     "DIHYDROGEN PHOSPHATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 2 },
         { "element": Elements_1.PERIODIC_TABLE.PHOSPHORUS, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -1, "DIHYDROGEN PHOSPHATE"),
+    ], [-1], "DIHYDROGEN PHOSPHATE"),
     "ACETATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CARBON, "quantity": 2 },
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 3 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 2 }
-    ], -1, "ACETATE"),
+    ], [-1], "ACETATE"),
     "PERCHLORATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CHLORINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -1, "PERCHLORATE"),
+    ], [-1], "PERCHLORATE"),
     "CHLORATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CHLORINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -1, "CHLORATE"),
+    ], [-1], "CHLORATE"),
     "CHLORITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CHLORINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 2 }
-    ], -1, "CHLORITE"),
+    ], [-1], "CHLORITE"),
     "HYPOCHLORITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CHLORINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 1 }
-    ], -1, "HYPOCHLORITE"),
+    ], [-1], "HYPOCHLORITE"),
     "PERIODATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.IODINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -1, "PERIODATE"),
+    ], [-1], "PERIODATE"),
     "IODATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.IODINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -1, "IODATE"),
+    ], [-1], "IODATE"),
     "IODITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.IODINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 2 }
-    ], -1, "IODITE"),
+    ], [-1], "IODITE"),
     "HYPOIODITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.IODINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 1 }
-    ], -1, "HYPOIODITE"),
+    ], [-1], "HYPOIODITE"),
     "PERBROMATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.BROMINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -1, "PERBROMATE"),
+    ], [-1], "PERBROMATE"),
     "BROMATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.BROMINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -1, "BROMATE"),
+    ], [-1], "BROMATE"),
     "BROMITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.BROMINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 2 }
-    ], -1, "BROMITE"),
+    ], [-1], "BROMITE"),
     "HYPOBROMITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.BROMINE, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 1 }
-    ], -1, "HYPOBROMITE"),
+    ], [-1], "HYPOBROMITE"),
     "CARBONATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.CARBON, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -2, "CARBONATE"),
+    ], [-2], "CARBONATE"),
     "HYDROGEN CARBONATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.CARBON, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -1, "HYDROGEN CARBONATE"),
+    ], [-1], "HYDROGEN CARBONATE"),
     "HYDROGEN SULFATE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.SULFUR, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 4 }
-    ], -1, "HYDROGEN SULFATE"),
+    ], [-1], "HYDROGEN SULFATE"),
     "HYDROGEN SULFITE": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.SULFUR, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.OXYGEN, "quantity": 3 }
-    ], -1, "HYDROGEN SULFITE"),
+    ], [-1], "HYDROGEN SULFITE"),
     // "HYDROGEN SULFIDE": new Bondable([
     //     { "element": PERIODIC_TABLE.HYDROGEN, "quantity": 1 },
     //     { "element": PERIODIC_TABLE.SULFUR, "quantity": 1 }], -1, "HYDROGEN SULFIDE"),
     "AMMONIUM": new Bondable([
         { "element": Elements_1.PERIODIC_TABLE.NITROGEN, "quantity": 1 },
         { "element": Elements_1.PERIODIC_TABLE.HYDROGEN, "quantity": 4 }
-    ], 1, "AMMONIUM")
+    ], [1], "AMMONIUM")
 };
 function getPolyatomic(quantifiedElement) {
     const polyatomics = Object.values(exports.POLYATOMICS);
-    return polyatomics.find(pa => {
+    const found = polyatomics.find(pa => {
         let equals = true;
         if (pa.elements.length == quantifiedElement.length) {
             for (let i = 0; i < quantifiedElement.length; i++) {
@@ -349,6 +363,11 @@ function getPolyatomic(quantifiedElement) {
             return false;
         }
     }) || null;
+    if (found) {
+        return found.clone();
+    }
+    else
+        return null;
 }
 exports.getPolyatomic = getPolyatomic;
 
@@ -363,15 +382,15 @@ exports.getPolyatomic = getPolyatomic;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.combineSuffix = exports.getFromSymbol = exports.compareQuantifiedElements = exports.compareElements = exports.HOFBrINClS = exports.NONMETALS = exports.NOBLE_GASES = exports.BONDABLE_NONMETALS = exports.METALS = exports.PERIODIC_TABLE = void 0;
+exports.combineSuffix = exports.getFromSymbol = exports.compareQuantifiedElements = exports.compareElements = exports.HOFBrINClS = exports.NONMETALS = exports.NOBLE_GASES = exports.BONDABLE_NONMETALS = exports.METALLOIDS = exports.METALS = exports.PERIODIC_TABLE = void 0;
 const Nomenclature_1 = __webpack_require__(/*! ./Nomenclature */ "./src/Nomenclature.ts");
 exports.PERIODIC_TABLE = {
-    HYDROGEN: { name: "HYDROGEN", number: 1, pos: [1, 1], charges: [1, -1], metal: false, symbol: "H" },
+    HYDROGEN: { name: "HYDROGEN", number: 1, pos: [1, 1], charges: [-1, 1], metal: false, symbol: "H" },
     HELIUM: { name: "HELIUM", number: 2, pos: [18, 1], charges: [], metal: false, symbol: "He" },
     LITHIUM: { name: "LITHIUM", number: 3, pos: [1, 2], charges: [1], metal: true, symbol: "Li" },
     BERYLLIUM: { name: "BERYLLIUM", number: 4, pos: [2, 2], charges: [2], metal: true, symbol: "Be" },
     BORON: { name: "BORON", number: 5, pos: [13, 2], charges: [3], metal: true, symbol: "B" },
-    CARBON: { name: "CARBON", number: 6, pos: [14, 2], charges: [4, -4], metal: false, symbol: "C" },
+    CARBON: { name: "CARBON", number: 6, pos: [14, 2], charges: [-4, 4], metal: false, symbol: "C" },
     NITROGEN: { name: "NITROGEN", number: 7, pos: [15, 2], charges: [-3], metal: false, symbol: "N" },
     OXYGEN: { name: "OXYGEN", number: 8, pos: [16, 2], charges: [-2], metal: false, symbol: "O" },
     FLUORINE: { name: "FLUORINE", number: 9, pos: [17, 2], charges: [-1], metal: false, symbol: "F" },
@@ -379,7 +398,7 @@ exports.PERIODIC_TABLE = {
     SODIUM: { name: "SODIUM", number: 11, pos: [1, 3], charges: [1], metal: true, symbol: "Na" },
     MAGNESIUM: { name: "MAGNESIUM", number: 12, pos: [2, 3], charges: [2], metal: true, symbol: "Mg" },
     ALUMINIUM: { name: "ALUMINIUM", number: 13, pos: [13, 3], charges: [3], metal: true, symbol: "Al" },
-    SILICON: { name: "SILICON", number: 14, pos: [14, 3], charges: [4, -4], metal: true, symbol: "Si" },
+    SILICON: { name: "SILICON", number: 14, pos: [14, 3], charges: [-4, 4], metal: true, symbol: "Si" },
     PHOSPHORUS: { name: "PHOSPHORUS", number: 15, pos: [15, 3], charges: [-3], metal: false, symbol: "P" },
     SULFUR: { name: "SULFUR", number: 16, pos: [16, 3], charges: [-2], metal: false, symbol: "S" },
     CHLORINE: { name: "CHLORINE", number: 17, pos: [17, 3], charges: [-1], metal: false, symbol: "Cl" },
@@ -387,17 +406,17 @@ exports.PERIODIC_TABLE = {
     POTASSIUM: { name: "POTASSIUM", number: 19, pos: [1, 4], charges: [1], metal: true, symbol: "K" },
     CALCIUM: { name: "CALCIUM", number: 20, pos: [2, 4], charges: [2], metal: true, symbol: "Ca" },
     SCANDIUM: { name: "SCANDIUM", number: 21, pos: [3, 4], charges: [3], metal: true, symbol: "Sc" },
-    TITANIUM: { name: "TITANIUM", number: 22, pos: [4, 4], charges: [4], metal: true, symbol: "Ti" },
-    VANADIUM: { name: "VANADIUM", number: 23, pos: [5, 4], charges: [5], metal: true, symbol: "V" },
+    TITANIUM: { name: "TITANIUM", number: 22, pos: [4, 4], charges: [3, 4], metal: true, symbol: "Ti" },
+    VANADIUM: { name: "VANADIUM", number: 23, pos: [5, 4], charges: [2, 5], metal: true, symbol: "V" },
     CHROMIUM: { name: "CHROMIUM", number: 24, pos: [6, 4], charges: [3, 6], metal: true, symbol: "Cr" },
     MANGANESE: { name: "MANGANESE", number: 25, pos: [7, 4], charges: [2, 4, 7], metal: true, symbol: "Mn" },
     IRON: { name: "IRON", number: 26, pos: [8, 4], charges: [2, 3], metal: true, symbol: "Fe" },
     COBALT: { name: "COBALT", number: 27, pos: [9, 4], charges: [2, 3], metal: true, symbol: "Co" },
-    NICKEL: { name: "NICKEL", number: 28, pos: [10, 4], charges: [2], metal: true, symbol: "Ni" },
-    COPPER: { name: "COPPER", number: 29, pos: [11, 4], charges: [2], metal: true, symbol: "Cu" },
+    NICKEL: { name: "NICKEL", number: 28, pos: [10, 4], charges: [2, 3], metal: true, symbol: "Ni" },
+    COPPER: { name: "COPPER", number: 29, pos: [11, 4], charges: [1, 2], metal: true, symbol: "Cu" },
     ZINC: { name: "ZINC", number: 30, pos: [12, 4], charges: [2], metal: true, symbol: "Zn" },
     GALLIUM: { name: "GALLIUM", number: 31, pos: [13, 4], charges: [3], metal: true, symbol: "Ga" },
-    GERMANIUM: { name: "GERMANIUM", number: 32, pos: [14, 4], charges: [4, -4], metal: true, symbol: "Ge" },
+    GERMANIUM: { name: "GERMANIUM", number: 32, pos: [14, 4], charges: [-4, 2, 4], metal: true, symbol: "Ge" },
     ARSENIC: { name: "ARSENIC", number: 33, pos: [15, 4], charges: [-3], metal: true, symbol: "As" },
     SELENIUM: { name: "SELENIUM", number: 34, pos: [16, 4], charges: [-2], metal: false, symbol: "Se" },
     BROMINE: { name: "BROMINE", number: 35, pos: [17, 4], charges: [-1], metal: false, symbol: "Br" },
@@ -406,17 +425,17 @@ exports.PERIODIC_TABLE = {
     STRONTIUM: { name: "STRONTIUM", number: 38, pos: [2, 5], charges: [2], metal: true, symbol: "Sr" },
     YTTRIUM: { name: "YTTRIUM", number: 39, pos: [3, 5], charges: [3], metal: true, symbol: "Y" },
     ZIRCONIUM: { name: "ZIRCONIUM", number: 40, pos: [4, 5], charges: [4], metal: true, symbol: "Zr" },
-    NIOBIUM: { name: "NIOBIUM", number: 41, pos: [5, 5], charges: [5], metal: true, symbol: "Nb" },
-    MOLYBDENUM: { name: "MOLYBDENUM", number: 42, pos: [6, 5], charges: [4, 6], metal: true, symbol: "Mo" },
-    TECHNETIUM: { name: "TECHNETIUM", number: 43, pos: [7, 5], charges: [4, 7], metal: true, symbol: "Tc" },
-    RUTHENIUM: { name: "RUTHENIUM", number: 44, pos: [8, 5], charges: [3, 4], metal: true, symbol: "Ru" },
-    RHODIUM: { name: "RHODIUM", number: 45, pos: [9, 5], charges: [3], metal: true, symbol: "Rh" },
-    PALLADIUM: { name: "PALLADIUM", number: 46, pos: [10, 5], charges: [2, 4], metal: true, symbol: "Pd" },
+    NIOBIUM: { name: "NIOBIUM", number: 41, pos: [5, 5], charges: [3, 5], metal: true, symbol: "Nb" },
+    MOLYBDENUM: { name: "MOLYBDENUM", number: 42, pos: [6, 5], charges: [2, 6], metal: true, symbol: "Mo" },
+    TECHNETIUM: { name: "TECHNETIUM", number: 43, pos: [7, 5], charges: [7], metal: true, symbol: "Tc" },
+    RUTHENIUM: { name: "RUTHENIUM", number: 44, pos: [8, 5], charges: [2, 3], metal: true, symbol: "Ru" },
+    RHODIUM: { name: "RHODIUM", number: 45, pos: [9, 5], charges: [2, 3], metal: true, symbol: "Rh" },
+    PALLADIUM: { name: "PALLADIUM", number: 46, pos: [10, 5], charges: [2, 3], metal: true, symbol: "Pd" },
     SILVER: { name: "SILVER", number: 47, pos: [11, 5], charges: [1], metal: true, symbol: "Ag" },
     CADMIUM: { name: "CADMIUM", number: 48, pos: [12, 5], charges: [2], metal: true, symbol: "Cd" },
     INDIUM: { name: "INDIUM", number: 49, pos: [13, 5], charges: [3], metal: true, symbol: "In" },
-    TIN: { name: "TIN", number: 50, pos: [14, 5], charges: [4, -4], metal: true, symbol: "Sn" },
-    ANTIMONY: { name: "ANTIMONY", number: 51, pos: [15, 5], charges: [-3], metal: true, symbol: "Sb" },
+    TIN: { name: "TIN", number: 50, pos: [14, 5], charges: [-4, 2, 4], metal: true, symbol: "Sn" },
+    ANTIMONY: { name: "ANTIMONY", number: 51, pos: [15, 5], charges: [5, -3], metal: true, symbol: "Sb" },
     TELLURIUM: { name: "TELLURIUM", number: 52, pos: [16, 5], charges: [-2], metal: true, symbol: "Te" },
     IODINE: { name: "IODINE", number: 53, pos: [17, 5], charges: [-1], metal: false, symbol: "I" },
     XENON: { name: "XENON", number: 54, pos: [18, 5], charges: [], metal: false, symbol: "Xe" },
@@ -424,17 +443,18 @@ exports.PERIODIC_TABLE = {
     BARIUM: { name: "BARIUM", number: 56, pos: [2, 6], charges: [2], metal: true, symbol: "Ba" },
     HAFNIUM: { name: "HAFNIUM", number: 72, pos: [4, 6], charges: [4], metal: true, symbol: "Hf" },
     TANTALUM: { name: "TANTALUM", number: 73, pos: [5, 6], charges: [5], metal: true, symbol: "Ta" },
-    TUNGSTEN: { name: "TUNGSTEN", number: 74, pos: [6, 6], charges: [4, 6], metal: true, symbol: "W" },
-    RHENIUM: { name: "RHENIUM", number: 75, pos: [7, 6], charges: [4], metal: true, symbol: "Re" },
-    OSMIUM: { name: "OSMIUM", number: 76, pos: [8, 6], charges: [4], metal: true, symbol: "Os" },
-    IRIDIUM: { name: "IRIDIUM", number: 77, pos: [9, 6], charges: [3, 4], metal: true, symbol: "Ir" },
-    PLATINUM: { name: "PLATINUM", number: 78, pos: [10, 6], charges: [2, 4], metal: true, symbol: "Pt" },
-    GOLD: { name: "GOLD", number: 79, pos: [11, 6], charges: [3], metal: true, symbol: "Au" },
+    TUNGSTEN: { name: "TUNGSTEN", number: 74, pos: [6, 6], charges: [2, 6], metal: true, symbol: "W" },
+    RHENIUM: { name: "RHENIUM", number: 75, pos: [7, 6], charges: [7, -1], metal: true, symbol: "Re" },
+    OSMIUM: { name: "OSMIUM", number: 76, pos: [8, 6], charges: [2, 3], metal: true, symbol: "Os" },
+    IRIDIUM: { name: "IRIDIUM", number: 77, pos: [9, 6], charges: [2, 3], metal: true, symbol: "Ir" },
+    PLATINUM: { name: "PLATINUM", number: 78, pos: [10, 6], charges: [2, 3], metal: true, symbol: "Pt" },
+    GOLD: { name: "GOLD", number: 79, pos: [11, 6], charges: [1, 3], metal: true, symbol: "Au" },
     MERCURY: { name: "MERCURY", number: 80, pos: [12, 6], charges: [1, 2], metal: true, symbol: "Hg" },
-    THALLIUM: { name: "THALLIUM", number: 81, pos: [13, 6], charges: [1, 3], metal: true, symbol: "Tl" },
+    THALLIUM: { name: "THALLIUM", number: 81, pos: [13, 6], charges: [3], metal: true, symbol: "Tl" },
     LEAD: { name: "LEAD", number: 82, pos: [14, 6], charges: [2, 4], metal: true, symbol: "Pb" },
 };
-exports.METALS = [exports.PERIODIC_TABLE.HYDROGEN, exports.PERIODIC_TABLE.LITHIUM, exports.PERIODIC_TABLE.BERYLLIUM, exports.PERIODIC_TABLE.BORON, exports.PERIODIC_TABLE.SODIUM, exports.PERIODIC_TABLE.MAGNESIUM, exports.PERIODIC_TABLE.ALUMINIUM, exports.PERIODIC_TABLE.SILICON, exports.PERIODIC_TABLE.POTASSIUM, exports.PERIODIC_TABLE.CALCIUM, exports.PERIODIC_TABLE.SCANDIUM, exports.PERIODIC_TABLE.TITANIUM, exports.PERIODIC_TABLE.VANADIUM, exports.PERIODIC_TABLE.CHROMIUM, exports.PERIODIC_TABLE.MANGANESE, exports.PERIODIC_TABLE.IRON, exports.PERIODIC_TABLE.COBALT, exports.PERIODIC_TABLE.NICKEL, exports.PERIODIC_TABLE.COPPER, exports.PERIODIC_TABLE.ZINC, exports.PERIODIC_TABLE.GALLIUM, exports.PERIODIC_TABLE.GERMANIUM, exports.PERIODIC_TABLE.ARSENIC, exports.PERIODIC_TABLE.RUBIDIUM, exports.PERIODIC_TABLE.STRONTIUM, exports.PERIODIC_TABLE.YTTRIUM, exports.PERIODIC_TABLE.ZIRCONIUM, exports.PERIODIC_TABLE.NIOBIUM, exports.PERIODIC_TABLE.MOLYBDENUM, exports.PERIODIC_TABLE.TECHNETIUM, exports.PERIODIC_TABLE.RUTHENIUM, exports.PERIODIC_TABLE.RHODIUM, exports.PERIODIC_TABLE.PALLADIUM, exports.PERIODIC_TABLE.SILVER, exports.PERIODIC_TABLE.CADMIUM, exports.PERIODIC_TABLE.INDIUM, exports.PERIODIC_TABLE.TIN, exports.PERIODIC_TABLE.ANTIMONY, exports.PERIODIC_TABLE.TELLURIUM, exports.PERIODIC_TABLE.IODINE, exports.PERIODIC_TABLE.CESIUM, exports.PERIODIC_TABLE.BARIUM, exports.PERIODIC_TABLE.HAFNIUM, exports.PERIODIC_TABLE.TANTALUM, exports.PERIODIC_TABLE.TUNGSTEN, exports.PERIODIC_TABLE.RHENIUM, exports.PERIODIC_TABLE.OSMIUM, exports.PERIODIC_TABLE.IRIDIUM, exports.PERIODIC_TABLE.PLATINUM, exports.PERIODIC_TABLE.GOLD, exports.PERIODIC_TABLE.MERCURY, exports.PERIODIC_TABLE.THALLIUM, exports.PERIODIC_TABLE.LEAD];
+exports.METALS = [exports.PERIODIC_TABLE.LITHIUM, exports.PERIODIC_TABLE.BERYLLIUM, exports.PERIODIC_TABLE.SODIUM, exports.PERIODIC_TABLE.MAGNESIUM, exports.PERIODIC_TABLE.ALUMINIUM, exports.PERIODIC_TABLE.POTASSIUM, exports.PERIODIC_TABLE.CALCIUM, exports.PERIODIC_TABLE.SCANDIUM, exports.PERIODIC_TABLE.TITANIUM, exports.PERIODIC_TABLE.VANADIUM, exports.PERIODIC_TABLE.CHROMIUM, exports.PERIODIC_TABLE.MANGANESE, exports.PERIODIC_TABLE.IRON, exports.PERIODIC_TABLE.COBALT, exports.PERIODIC_TABLE.NICKEL, exports.PERIODIC_TABLE.COPPER, exports.PERIODIC_TABLE.ZINC, exports.PERIODIC_TABLE.GALLIUM, exports.PERIODIC_TABLE.RUBIDIUM, exports.PERIODIC_TABLE.STRONTIUM, exports.PERIODIC_TABLE.YTTRIUM, exports.PERIODIC_TABLE.ZIRCONIUM, exports.PERIODIC_TABLE.NIOBIUM, exports.PERIODIC_TABLE.MOLYBDENUM, exports.PERIODIC_TABLE.TECHNETIUM, exports.PERIODIC_TABLE.RUTHENIUM, exports.PERIODIC_TABLE.RHODIUM, exports.PERIODIC_TABLE.PALLADIUM, exports.PERIODIC_TABLE.SILVER, exports.PERIODIC_TABLE.CADMIUM, exports.PERIODIC_TABLE.INDIUM, exports.PERIODIC_TABLE.TIN, exports.PERIODIC_TABLE.IODINE, exports.PERIODIC_TABLE.CESIUM, exports.PERIODIC_TABLE.BARIUM, exports.PERIODIC_TABLE.HAFNIUM, exports.PERIODIC_TABLE.TANTALUM, exports.PERIODIC_TABLE.TUNGSTEN, exports.PERIODIC_TABLE.RHENIUM, exports.PERIODIC_TABLE.OSMIUM, exports.PERIODIC_TABLE.IRIDIUM, exports.PERIODIC_TABLE.PLATINUM, exports.PERIODIC_TABLE.GOLD, exports.PERIODIC_TABLE.MERCURY, exports.PERIODIC_TABLE.THALLIUM, exports.PERIODIC_TABLE.LEAD];
+exports.METALLOIDS = [exports.PERIODIC_TABLE.BORON, exports.PERIODIC_TABLE.SILICON, exports.PERIODIC_TABLE.GERMANIUM, exports.PERIODIC_TABLE.ARSENIC, exports.PERIODIC_TABLE.ANTIMONY, exports.PERIODIC_TABLE.TELLURIUM];
 exports.BONDABLE_NONMETALS = [exports.PERIODIC_TABLE.HYDROGEN, exports.PERIODIC_TABLE.CARBON, exports.PERIODIC_TABLE.NITROGEN, exports.PERIODIC_TABLE.OXYGEN, exports.PERIODIC_TABLE.FLUORINE, exports.PERIODIC_TABLE.PHOSPHORUS, exports.PERIODIC_TABLE.SULFUR, exports.PERIODIC_TABLE.CHLORINE, exports.PERIODIC_TABLE.SELENIUM, exports.PERIODIC_TABLE.BROMINE, exports.PERIODIC_TABLE.IODINE];
 exports.NOBLE_GASES = [exports.PERIODIC_TABLE.NEON, exports.PERIODIC_TABLE.ARGON, exports.PERIODIC_TABLE.HELIUM, exports.PERIODIC_TABLE.KRYPTON, exports.PERIODIC_TABLE.XENON];
 exports.NONMETALS = exports.BONDABLE_NONMETALS.concat(exports.NOBLE_GASES);
@@ -449,7 +469,7 @@ function compareQuantifiedElements(el1, el2) {
 exports.compareQuantifiedElements = compareQuantifiedElements;
 function getFromSymbol(symbol) {
     const elements = Object.values(exports.PERIODIC_TABLE);
-    return elements.find(el => el.symbol == symbol);
+    return elements.find(el => el.symbol == symbol) || null;
 }
 exports.getFromSymbol = getFromSymbol;
 function combineSuffix(prefix, element, mono = false) {
@@ -645,6 +665,19 @@ var Nomenclature;
     };
     Nomenclature.MODDED_PREFIX_TO_NUM = (0, Util_1.swapObj)(Nomenclature.MODDED_PREFIX_MAP);
     Nomenclature.PREFIX_TO_NUM = (0, Util_1.swapObj)(Nomenclature.PREFIX_MAP);
+    Nomenclature.ROMAN_NUMERAL_MAP = {
+        1: "I",
+        2: "II",
+        3: "III",
+        4: "IV",
+        5: "V",
+        6: "VI",
+        7: "VII",
+        8: "VIII",
+        9: "IX",
+        10: "X"
+    };
+    Nomenclature.ROMAN_NUMERAL_TO_NUM = (0, Util_1.swapObj)(Nomenclature.ROMAN_NUMERAL_MAP);
 })(Nomenclature = exports.Nomenclature || (exports.Nomenclature = {}));
 
 
@@ -741,7 +774,7 @@ var Routine;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.swapObj = exports.sample = exports.capitalize = void 0;
+exports.reduce = exports.swapObj = exports.sample = exports.capitalize = void 0;
 function capitalize(s) {
     let strings = s.split(" ");
     for (let i = 0; i < strings.length; i++) {
@@ -762,6 +795,18 @@ function swapObj(obj) {
     return result;
 }
 exports.swapObj = swapObj;
+function reduce(numerator, denominator) {
+    var a = numerator;
+    var b = denominator;
+    var c;
+    while (b) {
+        c = a % b;
+        a = b;
+        b = c;
+    }
+    return [numerator / a, denominator / a];
+}
+exports.reduce = reduce;
 
 
 /***/ }),
@@ -805,7 +850,7 @@ exports.commonExplainationScript = {
         "COMMON": "I have information for all chemicals from [U]Hydrogen to Lead[/], [I]not including the Lanthanoids or Actinoids[/]. Sorry for the inconvenience!"
     },
     "INTRO": {
-        "IDENTIFICATION": "{INTRO.IDENTIFICATION.START}, we will {INTRO.IDENTIFICATION.TO_IDENTIFY} if the {INTRO.IDENTIFICATION.TO_CHECK_THE_FOLLOWING} compound is a [B]Ionic[/] or [B]Covalent[/] compound. An [B]Ionic[/] compound has the [U]metal[/] as the [B]cation[/] and [U]non-metal[/] as the [B]anion[/]. In ionic compounds, [U]metals will [B]give[/] electrons[/] and [U]non-metals will [B]take[/] electrons[/].",
+        "IDENTIFICATION": "{INTRO.IDENTIFICATION.START}, we will {INTRO.IDENTIFICATION.TO_IDENTIFY} if the {INTRO.IDENTIFICATION.TO_CHECK_THE_FOLLOWING} compound is a [B]Ionic[/] or [B]Covalent[/] compound. An [B]Ionic[/] compound has the [U]metal[/] as the [B]cation[/] and [U]non-metal[/] as the [B]anion[/]. In ionic compounds, [U]metals will [B]give[/] electrons[/] and [U]non-metals will [B]take[/] electrons[/]. In covalent compounds, [I]two non-metals share electrons[/] to form a covalent bond.",
         "CONTAINS_POLYATOMIC": "Before starting, notice this compound has more than 2 elements in it's formula, which means it contains a polyatomic.",
         "CONTAINS_POLYATOMIC_CATION": "Looking closely, [B]{CATION_F}[/] seems to be a [U]{CATION}[/] molecule.",
         "CONTAINS_POLYATOMIC_ANION": "Looking closely, [B]{ANION_F}[/] seems to be a [U]{ANION}[/] molecule.",
@@ -867,51 +912,217 @@ exports.compoundExplainationScript = {
         "POLYATOMIC_RESULT": "The polyatomic [B]{formula}[/] is also known as [B]{name}[/]."
     },
     "IONIC": {
-        "NEEDS_SWAP": "In this formula, the metal and non-metal are in the wrong places. In ionic compounds, the metal goes first, and is followed by the non-metal. The correct way to write this formula would be [B]{metal_f}{non_metal_f}[/].",
+        "NEEDS_SWAP": "In this formula, [U]the metal and non-metal are in the wrong places[/]. In ionic compounds, the metal goes first, and is followed by the non-metal. The correct way to write this formula would be [B]{metal_f}{nonmetal_f}[/].",
+        "INVALID_METAL_METAL": "[B]ionic[/] compound. This compound invalid, however, as the compound contains two metals. This is not possible.",
         "IS_IONIC": "[B]ionic[/] compound. We know this because the compound contains a [U]metal and non-metal[/]. In an ionic compound, the metal [I]gives it's electron to a non-metal[/] to create a [B]lattice[/] structure. In this formula,",
-        "IDENTIFY_POLY_METAL": "the metal is a polyatomic. [B]{metal_f}[/] is a polyatomic ion known as [B]{metal}[/].",
+        "IDENTIFY_POLY_METAL": "the metal is a polyatomic. [B]{metal_f}[/] is a polyatomic ion known as [B]{metal}[/],",
+        "IDENTIFY_MULTIVALENT_METAL": "the metal is a multivalent metal. [B]{metal_f}[/] is a multivalent metal that has [I]{charges_length} forms of ions[/] &ndash; [B]{list_multivalent}[/],",
         "IDENTIFY_METAL": "the metal is [B]{metal_f}[/],",
-        "IDENTIFY_POLY_NONMETAL": "and the non-metal, [B]{nonmetal_f}[/] is a polyatomic ion known as [B]{nonmetal}[/].",
+        "IDENTIFY_POLY_NONMETAL": "and non-metal [B]{nonmetal_f}[/] is a polyatomic ion known as [B]{nonmetal}[/].",
         "IDENTIFY_NONMETAL": "and the non-metal in the formula is [B]{nonmetal_f}[/].",
-        "DESCRIBE_BOND": "In this bond, [B]{metal}[/] gives its [I]{metal_gives} electrons[/] to [B]{nonmetal}[/].",
+        "DESCRIBE_BOND": "In this bond, [B]{metal_quantity} {metal_full}s[/] gives its [I]{metal_gives} electrons[/] to [B]{nonmetal}[/].",
+        "CHARGE_BALANCE_ERROR": "This bond is not possible, because [B]{nonmetal_quantity} {nonmetal}s[/] need [I]{nonmetal_takes} electrons[/].",
+        "MULTIVALENT_ERROR": "The multivalent element [B]{metal}[/] does not have a [B]{metal}{nonmetal_takes_roman}[/] ion.",
         "DESCRIBE_NO_SUFFIX": "To name this compound, we take the cation, and combine it with the anion. No modification of the non-metal's name is required, as [I]the non-metal is a polyatomic[/]. This compound would be called [U][B]{result}[/][/].",
         "DESCRIBE_SUFFIX": "To name this compound, we take the cation, and combine it with the anion ending with an [I]-ide[/]. {nonmetal} turns into [B]{anion}[/], so this compound would be called [U][B]{result}[/][/]."
     },
     "COVALENT": {
-        "IS_COVALENT": "[B]covalent[/] compound. Covalent compounds are when two non-metals bond by sharing an electron to fill it's outer shell."
+        "IS_COVALENT": "[B]covalent[/] compound. Covalent compounds are when two non-metals bond by sharing an electron to fill it's outer shell.",
+        "IDENTIFY_CATION": "",
+        "IDENTIFY_POLY_CATION": "The [B]{cation_f}[/] atoms form a [U]positive[/] polyatomic ion called [B]{cation}[/], which acts like a metal and wants to lose [B]{cation_gives} electrons[/].",
+        "IDENTIFY_POLY_ANION": "The [B]{anion_f}[/] atoms form a [U]negative[/] polyatomic ion called [B]{anion}[/], which acts like a non-metal and wants to gain [B]{anion_takes} electrons[/].",
+        "IDENTIFY_SHARED_ELECTRONS": "In this compound, [B]{cation_quantity} {cation}[/] and [B]{anion_quantity} {anion}[/] share [I]{shared_electrons} electrons[/].",
+        "DEFINE_NAMING_CONVENTION": "When naming covalent compounds, elements are prefixed by their quantity in the compound. The prefixes from 1-10 are [I]mono-, di-, tri-, tetra-, penta-, hexa-, hepta-, octa-, nona-, and deca-[/]. The first element is never prefixed with mono, but the second element is always prefixed. The second element will also receive a suffix of [I]-ide[/].",
+        "DESCRIBE_CATION_PREFIX": "The [B]{cation_quantity} {cation}s[/] is called [B]{full_cation}[/],",
+        "DESCRIBE_CATION_CONCAT_PREFIX": "Since [B]{cation}[/] starts with O or A, the prefix we use has to be adjusted to not clash with the element name.",
+        "DESCRIBE_CATION_NOPREFIX": "The [B]{cation_quantity {cation}[/] is not changed, because we do not use mono to the first element as a prefix.",
+        "DESCRIBE_ANION_PREFIX": "The [B]{anion_quantity} {anion}s[/] will be prefixed with [I]{anion_prefix}[/], and [I]-ide[/] will be used as a suffix.",
+        "DESCRIBE_ANION_CONCAT_PREFIX": "Since [B]{anion}[/] starts with O or A, the prefix we use has to be adjusted to not clash with the element name.",
+        "DESCRIBE_NAME": "The resulting compound would be called [B]{full_cation} {full_anion}[/]."
     }
 };
 function parseFormula(formula) {
-    const result = [];
-    const getQuantity = (n) => {
-        const num = Number(n || "1");
-        return Number.isNaN(num) ? 1 : num;
-    };
-    let segs = formula.split("");
-    let num = "";
-    let symbol = "";
-    for (let i = 0; i < segs.length; i++) {
-        const letter = segs[i];
-        let val = ChemicalCompounds_1.SUBSCRIPT_TO_NUM[letter];
-        if (val) {
-            num += val;
-        }
-        else {
-            const isLowerCase = letter.toLowerCase() == letter;
-            if (isLowerCase) {
-                symbol += letter;
+    let result = [];
+    return new Promise((res, rej) => {
+        const getElement = (s) => {
+            const element = (0, Elements_1.getFromSymbol)(s);
+            if (!element) {
+                const err = { "symbol": s };
+                rej(err);
+                return null;
+            }
+            return element;
+        };
+        const getQuantity = (n) => {
+            const num = Number(n || "1");
+            return Number.isNaN(num) ? 1 : num;
+        };
+        let segs = formula.trim().split("");
+        let num = "";
+        let symbol = "";
+        let poly = false;
+        let polyQueue = [];
+        if (segs.length == 0)
+            return res([]);
+        for (let i = 0; i < segs.length; i++) {
+            const letter = segs[i];
+            let val = ChemicalCompounds_1.SUBSCRIPT_TO_NUM[letter];
+            if (val) {
+                num += val;
             }
             else {
-                if (symbol !== "") {
-                    result.push({ "symbol": symbol, "quantity": getQuantity(num) });
+                const isParenthesis = letter == "(" || letter == ")";
+                const isLowerCase = letter.toLowerCase() == letter;
+                if (isLowerCase && !isParenthesis) {
+                    symbol += letter;
                 }
-                symbol = letter;
-                num = "";
+                else {
+                    if (isParenthesis) {
+                        if (letter == "(") {
+                            if (poly) {
+                                const err = { "symbol": symbol + ChemicalCompounds_1.QUANTITY_SUBSCRIPTS[Number(num)], "unbalancedBrace": true };
+                                return rej(err);
+                            }
+                            if (symbol == "POLY") {
+                                result.at(-1).quantity = getQuantity(num);
+                            }
+                            else if (symbol !== "") {
+                                const element = getElement(symbol);
+                                if (element) {
+                                    result.push(ChemicalCompounds_1.Bondable.fromElement(element, getQuantity(num)));
+                                }
+                                else {
+                                    return;
+                                }
+                            }
+                            poly = true;
+                            symbol = "";
+                        }
+                        else if (letter == ")") {
+                            const lastSymbol = segs[segs.findIndex((v, i) => v == ")" && segs[i - 1] == "(") - 2];
+                            if (symbol == "") {
+                                const err = { "symbol": lastSymbol, "invalidPoly": true };
+                                return rej(err);
+                            }
+                            if (!poly) {
+                                const err = { "symbol": lastSymbol, "unbalancedBrace": true };
+                                return rej(err);
+                            }
+                            const element = getElement(symbol);
+                            if (element) {
+                                polyQueue.push({ "element": element, "quantity": getQuantity(num) });
+                            }
+                            else {
+                                return;
+                            }
+                            let polyatomic;
+                            if (polyQueue.length === 1) {
+                                polyatomic = ChemicalCompounds_1.Bondable.fromElement(element);
+                            }
+                            else {
+                                polyatomic = (0, ChemicalCompounds_1.getPolyatomic)(polyQueue);
+                                if (!polyatomic) {
+                                    const err = { "symbol": polyQueue.map(q => q.element.symbol + (![0, 1].includes(q.quantity) ? ChemicalCompounds_1.QUANTITY_SUBSCRIPTS[q.quantity] : "")).join("") };
+                                    if (!poly) {
+                                        err.unbalancedBrace = true;
+                                    }
+                                    else {
+                                        err.invalidPoly = true;
+                                    }
+                                    return rej(err);
+                                }
+                            }
+                            result.push(polyatomic);
+                            symbol = "POLY";
+                            polyQueue = [];
+                            poly = false;
+                        }
+                    }
+                    else {
+                        if (symbol == "POLY") {
+                            result.at(-1).quantity = getQuantity(num);
+                            symbol = "";
+                        }
+                        else if (symbol !== "") {
+                            if (poly) {
+                                const element = getElement(symbol);
+                                if (element) {
+                                    polyQueue.push({
+                                        "element": element,
+                                        "quantity": getQuantity(num)
+                                    });
+                                }
+                                else {
+                                    return;
+                                }
+                            }
+                            else {
+                                const element = getElement(symbol);
+                                if (element) {
+                                    result.push(ChemicalCompounds_1.Bondable.fromElement(element, getQuantity(num)));
+                                }
+                                else {
+                                    return;
+                                }
+                            }
+                        }
+                        if (symbol != "POLY")
+                            symbol = letter;
+                    }
+                    num = "";
+                }
             }
         }
-    }
-    result.push({ "symbol": symbol, "quantity": getQuantity(num) });
-    return result;
+        if (poly) {
+            const err = { "symbol": segs[Math.min(1, segs.findIndex(s => s == "(") - 1)], "unbalancedBrace": true };
+            return rej(err);
+        }
+        if (symbol == "POLY") {
+            result.at(-1).quantity = getQuantity(num);
+        }
+        else {
+            const element = getElement(symbol);
+            if (element) {
+                result.push(ChemicalCompounds_1.Bondable.fromElement(element, getQuantity(num)));
+            }
+            else {
+                return;
+            }
+        }
+        const groupedResult = [];
+        const bondableArrToQuantifiedEl = (s) => ({ "element": s.singletonElement, "quantity": s.primaryQuantity });
+        while (result.length !== 0) {
+            let nextPoly = result.findIndex(b => !b.isSingleton());
+            let poly = null;
+            nextPoly = nextPoly == -1 ? 3 : nextPoly;
+            if (result.length >= 2) {
+                let sample = [];
+                let use = nextPoly;
+                if (result.length >= 3) {
+                    use = Math.min(3, nextPoly);
+                    sample = result.slice(0, use);
+                    poly = (0, ChemicalCompounds_1.getPolyatomic)(sample.map(bondableArrToQuantifiedEl));
+                }
+                if (poly == null) {
+                    use = Math.min(2, nextPoly);
+                    sample = result.slice(0, use);
+                    poly = (0, ChemicalCompounds_1.getPolyatomic)(sample.map(bondableArrToQuantifiedEl));
+                }
+                if (poly == null) {
+                    use = 1;
+                    sample = result.slice(0, use);
+                    poly = sample[0];
+                }
+                groupedResult.push(poly);
+                result.splice(0, use);
+            }
+            else {
+                groupedResult.push(result[0]);
+                result.splice(0, 1);
+            }
+        }
+        res(groupedResult);
+    });
 }
 exports.parseFormula = parseFormula;
 function compound() {
@@ -933,24 +1144,287 @@ function compound() {
                     yield new Scheduler_1.WaitForPromise(AudioPlayer_1.AudioPlayer.playAudiosInSequence(AudioPlayer_1.AudioPlayer.getAudioPath("INTRO.IDENTIFICATION.START", parseResult.variations[0]), AudioPlayer_1.AudioPlayer.getAudioPath("INTRO.IDENTIFICATION", "1"), AudioPlayer_1.AudioPlayer.getAudioPath("INTRO.IDENTIFICATION.TO_IDENTIFY", parseResult.variations[1]), AudioPlayer_1.AudioPlayer.getAudioPath("INTRO.IDENTIFICATION", "2"), AudioPlayer_1.AudioPlayer.getAudioPath("INTRO.IDENTIFICATION.TO_CHECK_THE_FOLLOWING", parseResult.variations[2]), AudioPlayer_1.AudioPlayer.getAudioPath("INTRO.IDENTIFICATION", "3")));
                 }
                 yield new Scheduler_1.WaitForMillis(500);
-                const compoundGroups = parseFormula(formula);
-                const validSymbols = Object.values(Elements_1.PERIODIC_TABLE).map(pe => pe.symbol);
-                // Validate all elements
-                for (const group of compoundGroups) {
-                    if (validSymbols.includes(group.symbol)) {
-                        console.log("Valid symbol: " + group.symbol);
-                    }
-                    else {
-                        console.log("Invalid symbol: " + group.symbol);
+                parseFormula(formula).then(bondables => {
+                    Scheduler_1.Routine.startTask(function* () {
+                        const isSingleton = bondables.length == 1;
+                        if (isSingleton) {
+                            if (bondables[0].isSingleton()) {
+                                const $singleton = $(`<div class="anim-in-down mt-4"></div>`);
+                                const explainations = [exports.compoundExplainationScript.LONE.IS_LONE];
+                                const audioExplainations = [AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.IS_LONE", "1")];
+                                const bondableSingleton = bondables[0];
+                                const symbol = bondableSingleton.singletonElement.symbol;
+                                const name = bondableSingleton.name;
+                                let combinedName;
+                                if (Elements_1.HOFBrINClS.includes(bondableSingleton.singletonElement) && bondableSingleton.primaryQuantity <= 2) {
+                                    combinedName = name;
+                                    explainations.push(exports.compoundExplainationScript.LONE.HOFBRINCL);
+                                    audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.HOFBRINCL", "1"));
+                                    if (bondableSingleton.primaryQuantity === 2) {
+                                        explainations.push(exports.compoundExplainationScript.LONE.VALID_HOFBRINCL);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.VALID_HOFBRINCL", "1"));
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.ELEMENT", name));
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.VALID_HOFBRINCL", "2"));
+                                        if (symbol != "Br" && symbol != "I") {
+                                            combinedName += " gas";
+                                        }
+                                        else {
+                                            combinedName += " (gas/solid/liquid)";
+                                        }
+                                    }
+                                    else {
+                                        explainations.push(exports.compoundExplainationScript.LONE.INVALID_HOFBRINCL);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.INVALID_HOFBRINCL", "1"));
+                                        combinedName = "Invalid formula";
+                                    }
+                                }
+                                else {
+                                    const combinationResult = (0, Elements_1.combineSuffix)(bondableSingleton.primaryQuantity, bondableSingleton.singletonElement);
+                                    const hasPrefix = !!combinationResult.prefix;
+                                    const ionic = Elements_1.METALS.includes(bondables[0].singletonElement);
+                                    combinedName = combinationResult.result;
+                                    const addSymbolSpeech = () => {
+                                        if (symbol.length == 2) {
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symbol[0]));
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symbol[1].toUpperCase()));
+                                        }
+                                        else {
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symbol));
+                                        }
+                                    };
+                                    if (ionic) {
+                                        explainations.push(exports.compoundExplainationScript.LONE.METAL);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.METAL", "1"));
+                                        addSymbolSpeech();
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.METAL", "2"));
+                                        if (hasPrefix)
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", combinationResult.prefix));
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.ELEMENT", name));
+                                    }
+                                    else {
+                                        explainations.push(exports.compoundExplainationScript.LONE.NONMETAL);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.NONMETAL", "1"));
+                                        addSymbolSpeech();
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.NONMETAL", "2"));
+                                        if (hasPrefix)
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", combinationResult.prefix));
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.ELEMENT", name));
+                                    }
+                                    if (bondableSingleton.primaryQuantity > 1) {
+                                        explainations.push(exports.compoundExplainationScript.LONE.PREFIX);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.PREFIX", "1"));
+                                        if (combinationResult.moddedPrefix) {
+                                            explainations.push(exports.compoundExplainationScript.LONE.MPREFIX);
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.MPREFIX", "1"));
+                                        }
+                                    }
+                                }
+                                const singletonMsg = Explainer_1.Explainer.parseExplainationString(explainations.join(" "), {
+                                    "symbol": symbol,
+                                    "name": (0, Util_1.capitalize)(combinedName.toLowerCase())
+                                });
+                                $singleton.html(singletonMsg.result);
+                                $introText.append($singleton);
+                                if (!mute) {
+                                    yield new Scheduler_1.WaitForPromise(AudioPlayer_1.AudioPlayer.playAudiosInSequence(...audioExplainations));
+                                }
+                                yield new Scheduler_1.WaitForMillis(500);
+                                return res((0, Util_1.capitalize)(combinedName.toLowerCase()));
+                            }
+                            else {
+                                const polyatomic = bondables[0];
+                                const explainations = [exports.compoundExplainationScript.LONE.POLYATOMIC];
+                                const audioExplainations = [AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC", "1")];
+                                if (polyatomic) {
+                                    const formula = polyatomic.chemicalFormula;
+                                    const name = polyatomic.name;
+                                    if (polyatomic.primaryCharge > 0) {
+                                        explainations.push(exports.compoundExplainationScript.LONE.POLYATOMIC_METAL);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_METAL", "1"));
+                                    }
+                                    else {
+                                        explainations.push(exports.compoundExplainationScript.LONE.POLYATOMIC_NONMETAL);
+                                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_NONMETAL", "1"));
+                                    }
+                                    explainations.push(exports.compoundExplainationScript.LONE.POLYATOMIC_RESULT);
+                                    audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_RESULT", "1"));
+                                    for (const letter of formula) {
+                                        const numVal = ChemicalCompounds_1.SUBSCRIPT_TO_NUM[letter];
+                                        if (numVal)
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", numVal.toString()));
+                                        else
+                                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", letter.toUpperCase()));
+                                    }
+                                    audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_RESULT", "2"));
+                                    audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.POLYATOMIC", name));
+                                    const polyatomicText = Explainer_1.Explainer.parseExplainationString(explainations.join(" "), {
+                                        "formula": formula,
+                                        "name": (0, Util_1.capitalize)(name.toLowerCase())
+                                    });
+                                    const $polyatomic = $(`<div class="anim-in-down mt-4"></div>`);
+                                    $polyatomic.html(polyatomicText.result);
+                                    $introText.append($polyatomic);
+                                    if (!mute) {
+                                        yield new Scheduler_1.WaitForPromise(AudioPlayer_1.AudioPlayer.playAudiosInSequence(...audioExplainations));
+                                    }
+                                    yield new Scheduler_1.WaitForMillis(500);
+                                    return res((0, Util_1.capitalize)(name.toLowerCase()));
+                                }
+                            }
+                        }
+                        const $sect2 = Explainer_1.Explainer.createExplainationSect();
+                        yield new Scheduler_1.WaitForMillis(100);
+                        Explainer_1.Explainer.followUpExplainationSect($sect2);
+                        const $listPoint2 = Explainer_1.Explainer.createListPoint($sect2, 2);
+                        yield new Scheduler_1.WaitForMillis(100);
+                        Explainer_1.Explainer.followUpListPoint($listPoint2);
+                        const $resultSect = Explainer_1.Explainer.createExplainationSect();
+                        const followUpResultsSection = () => __awaiter(this, void 0, void 0, function* () {
+                            Explainer_1.Explainer.followUpExplainationSect($resultSect);
+                            const $resultPoint = Explainer_1.Explainer.createListPoint($resultSect, 3);
+                            yield (0, __1.delay)(100);
+                            Explainer_1.Explainer.followUpListPoint($resultPoint);
+                        });
+                        yield new Scheduler_1.WaitForMillis(1000);
+                        const $identification = $(`<div class="anim-in-down"></div>`);
+                        const $result = $(`<div class="anim-in-down"></div>`);
+                        const ionic = bondables.length == 2 && ((bondables[0].actsLikeMetal && !["H"].concat(Elements_1.METALLOIDS.map(ep => ep.symbol)).includes(bondables[0].singletonElement.symbol)) || bondables[1].actsLikeMetal);
+                        let identificationText = [exports.compoundExplainationScript.INTRO.IDENTIFY];
+                        let resultingText = [];
+                        if (ionic) {
+                            const needsSwap = !bondables[0].actsLikeMetal;
+                            const [metal, nonmetal] = needsSwap ? [bondables[1], bondables[0]] : [bondables[0], bondables[1]];
+                            if (needsSwap)
+                                identificationText.push(exports.compoundExplainationScript.IONIC.NEEDS_SWAP);
+                            if (metal.actsLikeMetal && nonmetal.actsLikeMetal) {
+                                identificationText.push(exports.compoundExplainationScript.IONIC.INVALID_METAL_METAL);
+                                $identification.html(Explainer_1.Explainer.parseExplainationString(identificationText.join(" ")).result);
+                                $sect2.append($identification);
+                                yield new Scheduler_1.WaitForMillis(500);
+                                return res("Invalid formula");
+                            }
+                            const [metalReducedQuant, nonmetalReducedQuant] = (0, Util_1.reduce)(metal.primaryQuantity, nonmetal.primaryQuantity);
+                            const [metalQuant, nonmetalQuant] = [metal.primaryQuantity, nonmetal.primaryQuantity];
+                            const reducedChargesBalance = metal.charges.map(c => c * metalReducedQuant).includes(-nonmetal.primaryCharge * nonmetalReducedQuant);
+                            const chargesBalance = metal.charges.map(c => c * metalQuant).includes(-nonmetal.primaryCharge * nonmetalQuant);
+                            console.log(chargesBalance, reducedChargesBalance);
+                            let resultingName = (0, Util_1.capitalize)(metal.name.toLowerCase());
+                            let cationName = resultingName.toString();
+                            let anionName = (0, Util_1.capitalize)(nonmetal.name.toLowerCase());
+                            let invalid = false;
+                            identificationText.push(exports.compoundExplainationScript.IONIC.IS_IONIC);
+                            resultingText.push(exports.compoundExplainationScript.IONIC.DESCRIBE_BOND);
+                            if (metal.isSingleton()) {
+                                if (metal.isMultivalent) {
+                                    identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_MULTIVALENT_METAL);
+                                    if (chargesBalance) {
+                                        const denom = nonmetalQuant;
+                                        if (!metal.charges.includes(denom)) {
+                                            for (const charge of metal.charges) {
+                                                // Get multiples of charges (1, 2) (2, 4) (3, 6) etc
+                                                // Make sure non metal agrees with the charge
+                                                if ((charge % denom === 0) && nonmetal.charges.includes(-charge)) {
+                                                    resultingName += `(${Nomenclature_1.Nomenclature.ROMAN_NUMERAL_MAP[charge * denom]})`;
+                                                    cationName += `(${Nomenclature_1.Nomenclature.ROMAN_NUMERAL_MAP[charge * denom]})`;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            resultingName += `(${Nomenclature_1.Nomenclature.ROMAN_NUMERAL_MAP[denom]})`;
+                                            cationName += `(${Nomenclature_1.Nomenclature.ROMAN_NUMERAL_MAP[denom]})`;
+                                        }
+                                    }
+                                }
+                                else {
+                                    identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_METAL);
+                                }
+                            }
+                            else {
+                                identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_POLY_METAL);
+                            }
+                            if (chargesBalance) {
+                                if (nonmetal.isSingleton()) {
+                                    identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_NONMETAL);
+                                    resultingText.push(exports.compoundExplainationScript.IONIC.DESCRIBE_SUFFIX);
+                                    anionName = (0, Util_1.capitalize)(Nomenclature_1.Nomenclature.ELEMENT_TO_ANION[nonmetal.name].toLowerCase());
+                                    resultingName += " " + anionName;
+                                }
+                                else {
+                                    identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_POLY_NONMETAL);
+                                    resultingText.push(exports.compoundExplainationScript.IONIC.DESCRIBE_NO_SUFFIX);
+                                    resultingName += " " + (0, Util_1.capitalize)(nonmetal.name.toLowerCase());
+                                }
+                            }
+                            else {
+                                resultingText.push(exports.compoundExplainationScript.IONIC.CHARGE_BALANCE_ERROR);
+                                if (metal.isMultivalent) {
+                                    resultingText.push(exports.compoundExplainationScript.IONIC.MULTIVALENT_ERROR);
+                                }
+                                invalid = true;
+                            }
+                            let multivalentList = [];
+                            let multivalentJoined = "";
+                            if (metal.isMultivalent) {
+                                metal.charges.forEach(charge => {
+                                    multivalentList.push(`${(0, Util_1.capitalize)(metal.name.toLowerCase())}(${Nomenclature_1.Nomenclature.ROMAN_NUMERAL_MAP[charge]})`);
+                                });
+                                const a = multivalentList.splice(0, multivalentList.length - 1);
+                                const b = multivalentList;
+                                multivalentJoined = (a.join(", ") + " and " + b);
+                            }
+                            $identification.html(Explainer_1.Explainer.parseExplainationString(identificationText.join(" "), {
+                                "metal": (0, Util_1.capitalize)(metal.name.toLowerCase()),
+                                "metal_f": metal.chemicalFormula,
+                                "nonmetal": (0, Util_1.capitalize)(nonmetal.name.toLowerCase()),
+                                "nonmetal_f": nonmetal.chemicalFormula,
+                                "charges_length": metal.charges.length.toString(),
+                                "list_multivalent": multivalentJoined
+                            }).result);
+                            $sect2.append($identification);
+                            yield new Scheduler_1.WaitForSeconds(1);
+                            followUpResultsSection();
+                            yield new Scheduler_1.WaitForSeconds(1);
+                            $result.html(Explainer_1.Explainer.parseExplainationString(resultingText.join(" "), {
+                                "metal": (0, Util_1.capitalize)(metal.name.toLowerCase()),
+                                "metal_full": cationName,
+                                "metal_gives": (metal.primaryCharge * metalQuant).toString(),
+                                "metal_quantity": metalQuant.toString(),
+                                "nonmetal": (0, Util_1.capitalize)(nonmetal.name.toLowerCase()),
+                                "nonmetal_takes": (-nonmetal.primaryCharge * nonmetalQuant).toString(),
+                                "nonmetal_takes_roman": `(${Nomenclature_1.Nomenclature.ROMAN_NUMERAL_MAP[-nonmetal.primaryCharge]})`,
+                                "nonmetal_quantity": nonmetalQuant.toString(),
+                                "anion": anionName,
+                                "result": resultingName
+                            }).result);
+                            $resultSect.append($result);
+                            if (invalid) {
+                                return res("Invalid formula");
+                            }
+                            else {
+                                return res(resultingName);
+                            }
+                        }
+                        else {
+                            identificationText.push(exports.compoundExplainationScript.COVALENT.IS_COVALENT);
+                            $sect2.append($identification);
+                            // if ()
+                            followUpResultsSection();
+                            yield new Scheduler_1.WaitForSeconds(1);
+                            res("Work in progress");
+                        }
+                    });
+                }).catch((parseError) => {
+                    Scheduler_1.Routine.startTask(function* () {
                         const err = Explainer_1.Explainer.parseExplainationString(Common_1.commonExplainationScript.VALIDATION.FORMULA + " " + Common_1.commonExplainationScript.VALIDATION.COMMON, {
-                            "symbol": group.symbol
+                            "symbol": parseError.symbol
                         });
                         const $errBox = $(`<div class="anim-in-down mt-4"></div>`);
                         $errBox.html(err.result);
                         yield new Scheduler_1.WaitForMillis(500);
                         $introText.append($errBox);
                         if (!mute) {
-                            const symb = group.symbol.toUpperCase();
+                            const symb = parseError.symbol.toUpperCase();
                             const spellFormula = [
                                 AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symb[0])
                             ];
@@ -959,228 +1433,8 @@ function compound() {
                             yield new Scheduler_1.WaitForPromise(AudioPlayer_1.AudioPlayer.playAudiosInSequence(AudioPlayer_1.AudioPlayer.getAudioPath("VALIDATION.FORMULA", "1"), ...spellFormula, AudioPlayer_1.AudioPlayer.getAudioPath("VALIDATION.COMMON", "1")));
                         }
                         return res("Invalid formula");
-                    }
-                }
-                const quantifiedElements = compoundGroups.map(cg => ({
-                    "element": (0, Elements_1.getFromSymbol)(cg.symbol),
-                    "quantity": cg.quantity
-                }));
-                const isSingleton = compoundGroups.length == 1;
-                if (isSingleton) {
-                    const $singleton = $(`<div class="anim-in-down mt-4"></div>`);
-                    const explainations = [exports.compoundExplainationScript.LONE.IS_LONE];
-                    const audioExplainations = [AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.IS_LONE", "1")];
-                    const quantifiedSingleton = quantifiedElements[0];
-                    const symbol = quantifiedSingleton.element.symbol;
-                    const name = quantifiedSingleton.element.name;
-                    let combinedName;
-                    if (Elements_1.HOFBrINClS.includes(quantifiedSingleton.element) && quantifiedSingleton.quantity <= 2) {
-                        combinedName = name;
-                        explainations.push(exports.compoundExplainationScript.LONE.HOFBRINCL);
-                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.HOFBRINCL", "1"));
-                        if (quantifiedSingleton.quantity === 2) {
-                            explainations.push(exports.compoundExplainationScript.LONE.VALID_HOFBRINCL);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.VALID_HOFBRINCL", "1"));
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.ELEMENT", name));
-                            if (symbol != "Br" && symbol != "I") {
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.VALID_HOFBRINCL", "2"));
-                                combinedName += " gas";
-                            }
-                        }
-                        else {
-                            explainations.push(exports.compoundExplainationScript.LONE.INVALID_HOFBRINCL);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.INVALID_HOFBRINCL", "1"));
-                            combinedName = "Invalid formula";
-                        }
-                    }
-                    else {
-                        const combinationResult = (0, Elements_1.combineSuffix)(quantifiedSingleton.quantity, quantifiedSingleton.element);
-                        const hasPrefix = !!combinationResult.prefix;
-                        const ionic = Elements_1.METALS.includes(quantifiedElements[0].element);
-                        combinedName = combinationResult.result;
-                        const addSymbolSpeech = () => {
-                            if (symbol.length == 2) {
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symbol[0]));
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symbol[1].toUpperCase()));
-                            }
-                            else {
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", symbol));
-                            }
-                        };
-                        if (ionic) {
-                            explainations.push(exports.compoundExplainationScript.LONE.METAL);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.METAL", "1"));
-                            addSymbolSpeech();
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.METAL", "2"));
-                            if (hasPrefix)
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", combinationResult.prefix));
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.ELEMENT", name));
-                        }
-                        else {
-                            explainations.push(exports.compoundExplainationScript.LONE.NONMETAL);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.NONMETAL", "1"));
-                            addSymbolSpeech();
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.NONMETAL", "2"));
-                            if (hasPrefix)
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", combinationResult.prefix));
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.ELEMENT", name));
-                        }
-                        if (quantifiedSingleton.quantity > 1) {
-                            explainations.push(exports.compoundExplainationScript.LONE.PREFIX);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.PREFIX", "1"));
-                            if (combinationResult.moddedPrefix) {
-                                explainations.push(exports.compoundExplainationScript.LONE.MPREFIX);
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.MPREFIX", "1"));
-                            }
-                        }
-                    }
-                    const singletonMsg = Explainer_1.Explainer.parseExplainationString(explainations.join(" "), {
-                        "symbol": symbol,
-                        "name": (0, Util_1.capitalize)(combinedName.toLowerCase())
                     });
-                    $singleton.html(singletonMsg.result);
-                    $introText.append($singleton);
-                    if (!mute) {
-                        yield new Scheduler_1.WaitForPromise(AudioPlayer_1.AudioPlayer.playAudiosInSequence(...audioExplainations));
-                    }
-                    yield new Scheduler_1.WaitForMillis(500);
-                    return res((0, Util_1.capitalize)(combinedName.toLowerCase()));
-                }
-                else {
-                    const polyatomic = (0, ChemicalCompounds_1.getPolyatomic)(quantifiedElements);
-                    const explainations = [exports.compoundExplainationScript.LONE.POLYATOMIC];
-                    const audioExplainations = [AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC", "1")];
-                    if (polyatomic) {
-                        const formula = polyatomic.chemicalFormula;
-                        const name = polyatomic.name;
-                        if (polyatomic.charge > 0) {
-                            explainations.push(exports.compoundExplainationScript.LONE.POLYATOMIC_METAL);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_METAL", "1"));
-                        }
-                        else {
-                            explainations.push(exports.compoundExplainationScript.LONE.POLYATOMIC_NONMETAL);
-                            audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_NONMETAL", "1"));
-                        }
-                        explainations.push(exports.compoundExplainationScript.LONE.POLYATOMIC_RESULT);
-                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_RESULT", "1"));
-                        for (const letter of formula) {
-                            const numVal = ChemicalCompounds_1.SUBSCRIPT_TO_NUM[letter];
-                            if (numVal)
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", numVal.toString()));
-                            else
-                                audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.MISC", letter.toUpperCase()));
-                        }
-                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("C/LONE.POLYATOMIC_RESULT", "2"));
-                        audioExplainations.push(AudioPlayer_1.AudioPlayer.getAudioPath("ELEMENTS.POLYATOMIC", name));
-                        const polyatomicText = Explainer_1.Explainer.parseExplainationString(explainations.join(" "), {
-                            "formula": formula,
-                            "name": (0, Util_1.capitalize)(name.toLowerCase())
-                        });
-                        const $polyatomic = $(`<div class="anim-in-down mt-4"></div>`);
-                        $polyatomic.html(polyatomicText.result);
-                        $introText.append($polyatomic);
-                        if (!mute) {
-                            yield new Scheduler_1.WaitForPromise(AudioPlayer_1.AudioPlayer.playAudiosInSequence(...audioExplainations));
-                        }
-                        yield new Scheduler_1.WaitForMillis(500);
-                        return res((0, Util_1.capitalize)(name.toLowerCase()));
-                    }
-                }
-                const bondables = [];
-                let parseQueue = quantifiedElements.copyWithin(0, 0);
-                while (parseQueue.length !== 0) {
-                    let useLength = 0;
-                    let foundElement = null;
-                    if (parseQueue.length >= 2) {
-                        if (parseQueue.length >= 3) {
-                            foundElement = (0, ChemicalCompounds_1.getPolyatomic)(parseQueue.slice(0, 3));
-                            useLength = 3;
-                        }
-                        if (!foundElement) {
-                            foundElement = (0, ChemicalCompounds_1.getPolyatomic)(parseQueue.slice(0, 2));
-                            useLength = 2;
-                        }
-                    }
-                    if (!foundElement) {
-                        const element = parseQueue[0];
-                        foundElement = new ChemicalCompounds_1.Bondable([element], element.element.charges[0], element.element.name);
-                        useLength = 1;
-                    }
-                    parseQueue.splice(0, useLength);
-                    bondables.push(foundElement);
-                }
-                const $sect2 = Explainer_1.Explainer.createExplainationSect();
-                yield new Scheduler_1.WaitForMillis(100);
-                Explainer_1.Explainer.followUpExplainationSect($sect2);
-                const $listPoint2 = Explainer_1.Explainer.createListPoint($sect2, 2);
-                yield new Scheduler_1.WaitForMillis(500);
-                Explainer_1.Explainer.followUpListPoint($listPoint2);
-                const $resultSect = Explainer_1.Explainer.createExplainationSect();
-                const followUpResultsSection = () => __awaiter(this, void 0, void 0, function* () {
-                    Explainer_1.Explainer.followUpExplainationSect($resultSect);
-                    const $resultPoint = Explainer_1.Explainer.createListPoint($resultSect, 3);
-                    yield (0, __1.delay)(100);
-                    Explainer_1.Explainer.followUpListPoint($resultPoint);
                 });
-                yield new Scheduler_1.WaitForMillis(1000);
-                const $identification = $(`<div class="anim-in-down"></div>`);
-                const $result = $(`<div class="anim-in-down"></div>`);
-                const ionic = bondables.length == 2 && (bondables[0].actsLikeMetal || bondables[1].actsLikeMetal);
-                const chargesBalance = bondables.map(b => b.charge).reduce((accumulate, v) => accumulate + v) === 0;
-                let identificationText = [exports.compoundExplainationScript.INTRO.IDENTIFY];
-                let resultingText = [];
-                if (ionic && chargesBalance) {
-                    const needsSwap = !bondables[0].actsLikeMetal;
-                    const [metal, nonmetal] = needsSwap ? [bondables[1], bondables[0]] : [bondables[0], bondables[1]];
-                    if (needsSwap)
-                        identificationText.push(exports.compoundExplainationScript.IONIC.NEEDS_SWAP);
-                    let resultingName = (0, Util_1.capitalize)(metal.name.toLowerCase()) + " ";
-                    let anionName = (0, Util_1.capitalize)(nonmetal.name.toLowerCase());
-                    identificationText.push(exports.compoundExplainationScript.IONIC.IS_IONIC);
-                    resultingText.push(exports.compoundExplainationScript.IONIC.DESCRIBE_BOND);
-                    if (metal.isSingleton()) {
-                        identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_METAL);
-                    }
-                    else {
-                        identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_POLY_METAL);
-                    }
-                    if (nonmetal.isSingleton()) {
-                        identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_NONMETAL);
-                        resultingText.push(exports.compoundExplainationScript.IONIC.DESCRIBE_SUFFIX);
-                        anionName = (0, Util_1.capitalize)(Nomenclature_1.Nomenclature.ELEMENT_TO_ANION[nonmetal.name].toLowerCase());
-                        resultingName += anionName;
-                    }
-                    else {
-                        identificationText.push(exports.compoundExplainationScript.IONIC.IDENTIFY_POLY_NONMETAL);
-                        resultingText.push(exports.compoundExplainationScript.IONIC.DESCRIBE_NO_SUFFIX);
-                        resultingName += (0, Util_1.capitalize)(nonmetal.name.toLowerCase());
-                    }
-                    $identification.html(Explainer_1.Explainer.parseExplainationString(identificationText.join(" "), {
-                        "metal": (0, Util_1.capitalize)(metal.name.toLowerCase()),
-                        "metal_f": metal.chemicalFormula,
-                        "nonmetal": (0, Util_1.capitalize)(nonmetal.name.toLowerCase()),
-                        "nonmetal_f": nonmetal.chemicalFormula,
-                    }).result);
-                    $sect2.append($identification);
-                    yield new Scheduler_1.WaitForSeconds(1);
-                    followUpResultsSection();
-                    yield new Scheduler_1.WaitForMillis(500);
-                    $result.html(Explainer_1.Explainer.parseExplainationString(resultingText.join(" "), {
-                        "metal": (0, Util_1.capitalize)(metal.name.toLowerCase()),
-                        "nonmetal": (0, Util_1.capitalize)(nonmetal.name.toLowerCase()),
-                        "anion": anionName,
-                        "metal_gives": metal.charge.toString(),
-                        "result": resultingName
-                    }).result);
-                    $resultSect.append($result);
-                    return res(resultingName);
-                }
-                else {
-                    if (chargesBalance) { } //TODO
-                    identificationText.push(exports.compoundExplainationScript.COVALENT.IS_COVALENT);
-                    $sect2.append($identification);
-                }
-                res("Work in progress");
             });
         });
     });
@@ -1246,7 +1500,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ButtonLogic = exports.delay = exports.$mutedSwitch = exports.$execBtnsContainer = exports.$resetBtn = exports.$findCompoundBtn = exports.$findFormulaBtn = exports.$input = exports.$main = exports.$noticeConfirmBtn = exports.$notice = void 0;
+exports.ButtonLogic = exports.delay = exports.$compoundDesc = exports.$compoundSummaryContainer = exports.$formulaDesc = exports.$formulaSummaryContainer = exports.$mutedSwitch = exports.$execBtnsContainer = exports.$resetBtn = exports.$findCompoundBtn = exports.$findFormulaBtn = exports.$input = exports.$main = exports.$noticeConfirmBtn = exports.$notice = void 0;
 const ChemicalCompounds_1 = __webpack_require__(/*! ./ChemicalCompounds */ "./src/ChemicalCompounds.ts");
 const Explainer_1 = __webpack_require__(/*! ./Explainer */ "./src/Explainer.ts");
 const Util_1 = __webpack_require__(/*! ./Util */ "./src/Util.ts");
@@ -1254,18 +1508,6 @@ const Compound_1 = __webpack_require__(/*! ./explainations/Compound */ "./src/ex
 const Formula_1 = __webpack_require__(/*! ./explainations/Formula */ "./src/explainations/Formula.ts");
 exports.$notice = $("#notice-box");
 exports.$noticeConfirmBtn = $("#notice-confirm");
-exports.$noticeConfirmBtn.on("click", () => {
-    exports.$noticeConfirmBtn.attr("disabled", "disabled");
-    exports.$notice.css({ "pointer-events": "none", "background": "transparent" });
-    exports.$notice.children().addClass("anim-out-down");
-    setTimeout(() => {
-        exports.$main.addClass("anim-in-down");
-    }, 500);
-    setTimeout(() => {
-        exports.$notice.removeClass("d-flex");
-        exports.$notice.addClass("d-none");
-    }, 1000);
-});
 exports.$main = $("main");
 exports.$input = $("#input");
 exports.$findFormulaBtn = $("#find-formula");
@@ -1273,30 +1515,45 @@ exports.$findCompoundBtn = $("#find-compound");
 exports.$resetBtn = $("#reset");
 exports.$execBtnsContainer = $("#exec-buttons");
 exports.$mutedSwitch = $("#muted");
+exports.$formulaSummaryContainer = $("#formula");
+exports.$formulaDesc = $("#formula-desc");
+exports.$compoundSummaryContainer = $("#compound");
+exports.$compoundDesc = $("#compound-desc");
 const delay = (ms) => new Promise(r => setInterval(r, ms));
 exports.delay = delay;
 $(window).on("load", () => {
     ButtonLogic.inputEnable(true);
     const examples = [
-        "Dihydrogen Monoxide",
-        "Carbon Dioxide",
-        "Sodium Chloride",
-        "Lead II Chloride",
-        "Ammonium Iodide",
-        "H2O",
+        // "Dihydrogen Monoxide",
+        // "Carbon Dioxide",
+        // "Sodium Chloride",
+        // "Lead II Chloride",
+        // "Ammonium Iodide",
+        // "H2O",
         "NH4",
-        "CO2",
+        // "CO2",
         "NaCl",
         "H2",
         "O2",
         "O3",
-        "NH4OH"
+        "NH4OH",
+        "CuCl3",
+        "Fe2O3",
+        "Fe2O2",
+        "Pb(C2H3O2)2",
+        "Fe2(NO3)2"
     ];
-    exports.$input.trigger("focus");
-    // $input.val(sample(examples));
-    exports.$input.val("NH4OH");
+    exports.$input.val((0, Util_1.sample)(examples));
+    // $input.val("Fe2(NO3)2");
     exports.$input.trigger("input");
     window.mute = true;
+}).on("keydown", event => {
+    if (event.key == "Enter") {
+        if (!exports.$noticeConfirmBtn.attr("disabled")) {
+            event.preventDefault();
+            exports.$noticeConfirmBtn.trigger("click");
+        }
+    }
 });
 exports.$input.on("input", () => {
     const val = exports.$input.val().toString();
@@ -1304,11 +1561,14 @@ exports.$input.on("input", () => {
         ButtonLogic.inputMode = "NONE";
         exports.$findFormulaBtn.attr("disabled", "disabled");
         exports.$findCompoundBtn.attr("disabled", "disabled");
-        if (val.length == 0)
+        if (val.length == 0) {
+            exports.$formulaSummaryContainer.hide();
+            exports.$compoundSummaryContainer.hide();
             return "";
+        }
         ButtonLogic.inputMode = new RegExp("[a-z]{2}").test(val) ? "COMPOUND" : "FORMULA";
         let result = val;
-        result = result.replace(new RegExp("!"), "1").replace(new RegExp("@"), "2").replace(new RegExp("#"), "3").replace(new RegExp("\\$"), "4").replace(new RegExp("%"), "5").replace(new RegExp("\\^"), "6").replace(new RegExp("&"), "7").replace(new RegExp("\\*"), "8").replace(new RegExp("\\("), "9").replace(new RegExp("\\)"), "0");
+        result = result.replace(new RegExp("!"), "1").replace(new RegExp("@"), "2").replace(new RegExp("#"), "3").replace(new RegExp("\\$"), "4").replace(new RegExp("%"), "5").replace(new RegExp("\\^"), "6").replace(new RegExp("&"), "7").replace(new RegExp("\\*"), "8");
         if (ButtonLogic.inputMode == "COMPOUND") {
             result = result.replace(new RegExp("[^ \\w]+", "g"), "");
             result = result.replace(new RegExp("1", "g"), "I").replace(new RegExp("2", "g"), "II").replace(new RegExp("3", "g"), "III").replace(new RegExp("4", "g"), "IV").replace(new RegExp("5", "g"), "V").replace(new RegExp("6", "g"), "VI").replace(new RegExp("7", "g"), "VII").replace(new RegExp("8", "g"), "VIII").replace(new RegExp("9", "g"), "IX").replace(new RegExp("10", "g"), "X").replace(new RegExp("I0", "g"), "X");
@@ -1319,7 +1579,7 @@ exports.$input.on("input", () => {
             for (const quantity in ChemicalCompounds_1.QUANTITY_SUBSCRIPTS)
                 result = result.replace(new RegExp(quantity, "g"), ChemicalCompounds_1.QUANTITY_SUBSCRIPTS[quantity]);
             result = result.replace(new RegExp("^[₀₁₂₃₄₅₆₇₈₉]+", "g"), "");
-            result = result.replace(new RegExp("[^ \\w₁₂₃₄₅₆₇₈₉₀]+", "g"), "");
+            result = result.replace(new RegExp("[^ \\w₁₂₃₄₅₆₇₈₉₀()]+", "g"), "");
             result = result.replace(new RegExp("(\\w)₀"), "$1");
             "₀₁₂₃₄₅₆₇₈₉".split("").forEach(sub => {
                 result = result.split(sub).map(r => (0, Util_1.capitalize)(r)).join(sub);
@@ -1358,7 +1618,17 @@ exports.$input.on("input", () => {
             result = fResult;
         }
         ButtonLogic.toggleModeButtons();
-        return (0, Util_1.capitalize)(result).trimStart();
+        result = (0, Util_1.capitalize)(result).trimStart();
+        if (ButtonLogic.inputMode == "FORMULA") {
+            exports.$formulaSummaryContainer.show();
+            exports.$compoundSummaryContainer.hide();
+            formulaAnalysis(result);
+        }
+        else {
+            exports.$formulaSummaryContainer.hide();
+            exports.$compoundSummaryContainer.show();
+        }
+        return result;
     })(val));
 });
 var ButtonLogic;
@@ -1427,6 +1697,48 @@ var ButtonLogic;
     }
     ButtonLogic.reset = reset;
 })(ButtonLogic = exports.ButtonLogic || (exports.ButtonLogic = {}));
+function formulaAnalysis(formula) {
+    (0, Compound_1.parseFormula)(formula).then(bondables => {
+        const resultGroupText = [];
+        for (const bondable of bondables) {
+            resultGroupText.push(bondable.primaryQuantity + " " + (0, Util_1.capitalize)(bondable.name.toLowerCase()) + (bondable.primaryQuantity == 1 ? "" : "s"));
+        }
+        exports.$formulaDesc.text(resultGroupText.join(" + "));
+    }).catch((err) => {
+        if (err.invalidPoly) {
+            if (err.symbol) {
+                exports.$formulaDesc.text(`Invalid Polyatomic (${err.symbol})`);
+            }
+            else {
+                exports.$formulaDesc.text(`Invalid Polyatomic`);
+            }
+        }
+        else if (err.unbalancedBrace) {
+            if (err.symbol) {
+                exports.$formulaDesc.text(`Unbalanced Brace (before ${err.symbol})`);
+            }
+            else {
+                exports.$formulaDesc.text(`Unbalanced Brace`);
+            }
+        }
+        else {
+            exports.$formulaDesc.text(`Unrecognized Symbol "${err.symbol}"`);
+        }
+    });
+}
+exports.$noticeConfirmBtn.on("click", () => {
+    exports.$noticeConfirmBtn.attr("disabled", "disabled");
+    exports.$notice.css({ "pointer-events": "none", "background": "transparent" });
+    exports.$notice.children().addClass("anim-out-down");
+    exports.$input.trigger("focus");
+    setTimeout(() => {
+        exports.$main.addClass("anim-in-down");
+    }, 500);
+    setTimeout(() => {
+        exports.$notice.removeClass("d-flex");
+        exports.$notice.addClass("d-none");
+    }, 1000);
+});
 exports.$input.on("keydown", event => {
     if (event.key == "Enter") {
         exports.$input.trigger("blur");
