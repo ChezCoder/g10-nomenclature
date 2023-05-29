@@ -1,6 +1,6 @@
 import { QUANTITY_SUBSCRIPTS, SUBSCRIPT_TO_NUM } from "./ChemicalCompounds";
 import { $explaination, Explainer } from "./Explainer";
-import { capitalize } from "./Util";
+import { capitalize, sample } from "./Util";
 import { ParseError, compound, parseFormula } from "./explainations/Compound";
 import { formula } from "./explainations/Formula";
 
@@ -26,14 +26,14 @@ $(window).on("load", () => {
     ButtonLogic.inputEnable(true);
 
     const examples = [
-        "Dihydrogen Monoxide",
-        "Carbon Dioxide",
-        "Sodium Chloride",
-        "Lead II Chloride",
-        "Ammonium Iodide",
-        "H2O",
+        // "Dihydrogen Monoxide",
+        // "Carbon Dioxide",
+        // "Sodium Chloride",
+        // "Lead II Chloride",
+        // "Ammonium Iodide",
+        // "H2O",
         "NH4",
-        "CO2",
+        // "CO2",
         "NaCl",
         "H2",
         "O2",
@@ -42,11 +42,12 @@ $(window).on("load", () => {
         "CuCl3",
         "Fe2O3",
         "Fe2O2",
-        "Pb(C2H3O2)2"
+        "Pb(C2H3O2)2",
+        "Fe2(NO3)2"
     ];
 
-    // $input.val(sample(examples));
-    $input.val("Fe2(NO3)2");
+    $input.val(sample(examples));
+    // $input.val("Fe2(NO3)2");
     $input.trigger("input");
 
     (<any> window).mute = true;
