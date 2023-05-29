@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./dist/assets/fontawesome/css/all.min.css">
+        <link rel="stylesheet" href="./dist/assets/mdb/css/mdb.min.css">
+        <!-- <link rel="stylesheet" href="./assets/mdb/css/mdb.dark.min.css"> -->
+        <link rel="stylesheet" href="./style.css">
+        <title>Chemistry Nomenclature</title>
+    </head>
+    <body>
+        <dialog class="w-100 h-100 container-fluid d-flex flex-column align-items-center gap-5 justify-content-center" id="notice-box">
+            <div class="container text-center">
+                <h1>This application has audio!</h1>
+                <div class="container-fluid mt-5">
+                    <span class="d-block">Make sure to turn up your volume to not miss</span>
+                    <span class="d-block">the voiceovers that took me over 8 hours to record</span>
+                </div>
+            </div>
+            <div class="container text-center">
+                <button id="notice-confirm" class="btn btn-rounded btn-success">Got it!</button>
+            </div>
+        </dialog>
+
+        <main class="container-fluid gap-4 w-100 h-100 d-flex align-items-center flex-column">
+            <header>
+                <h1>Chemical Nomenclature</h1>
+            </header>
+            <div class="d-flex flex-column gap-4 text-center">
+                <div class="d-flex flex-column italic">
+                    <span>Enter either a valid chemical formula or compound name.</span>
+                    <span>Use roman numerals (I, II, etc.) for multivalent elements</span>
+                    <span>This application still has bugs so if you find one just look the other way :D</span>
+                </div>
+
+                <div class="form-outline">
+                    <input type="text" id="input" class="form-control" autocomplete="off">
+                    <label class="form-label" for="compound-name">Compound name</label>
+                </div>
+
+                <div class="validation-summary">
+                    <div id="formula">
+                        <span>Ions Recognized:</span>
+                        <div id="formula-desc"></div>
+                    </div>
+                    <div id="compound">
+                        <div id="compound-desc"></div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div id="exec-buttons" class="d-flex flex-column justify-content-center text-center container gap-2">
+                <button disabled id="find-formula" class="btn btn-outline-primary" data-mdb-ripple-color="dark">Find Formula</button>
+                <button disabled id="find-compound" class="btn btn-outline-primary" data-mdb-ripple-color="dark">Find Compound Name</button>
+
+                <div class="d-flex justify-content-center mb-2 mt-1 gap-2 form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="muted" />
+                    <label class="form-check-label" for="muted">Play Voiceover</label>
+                </div>
+            </div>
+
+            <div class="container-fluid text-center">
+                <div id="explaination"></div>
+                <button disabled id="reset" class="btn btn-secondary btn-rounded">Try Another</button>
+            </div>
+        </main>
+        <script src="./dist/assets/fontawesome/js/all.min.js"></script>
+        <script src="./dist/assets/mdb/js/mdb.min.js"></script>
+        <script src="./dist/assets/jquery/jquery.min.js"></script>
+        <script src="./dist/bundle.js"></script>
+        <script src="./dist/p5.js"></script>
+    </body>
+</html>
